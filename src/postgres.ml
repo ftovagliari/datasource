@@ -1,3 +1,25 @@
+(*
+
+  "datasource"
+  Copyright (C) 2010, 2011 Francesco Tovagliari
+
+  This file is part of "datasource".
+
+  "datasource" is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  "datasource" is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+*)
+
 module PGOCaml = FastPGOCaml
 
 module Datasource = Datasource.Make (
@@ -36,7 +58,7 @@ let replace_all re subst str =
 let read_file filename =
   let ichan = open_in_bin filename in
   let finally () = close_in ichan in
-  try 
+  try
     let length = in_channel_length ichan in
     let data = Buffer.create length in
     Buffer.add_channel data ichan length;
@@ -74,7 +96,7 @@ let escape_slow str =
   end str;
   String.concat "" (List.rev !result)
 
-(** escape *) 
+(** escape *)
 let escape =
   let find n = List.assoc n [0, "0"; 1, "1"; 2, "2"; 3, "3"; 4 , "4"; 5, "5"; 6, "6"; 7, "7"] in
   let rec octal n =
@@ -87,11 +109,11 @@ let escape =
     let s = octal n in
     "\\\\" ^ (String.make (3 - String.length s) '0') ^ s in
   let escape_char = function
-    | '\'' -> "\\\\047" 
+    | '\'' -> "\\\\047"
     | '\\' -> "\\\\134"
     | c ->
       let dec = Char.code c in
-      if dec > 31 && dec < 127 then String.make 1 c else octpad dec 
+      if dec > 31 && dec < 127 then String.make 1 c else octpad dec
   in
   let escape_char = memo ~f:escape_char in
   fun str ->
