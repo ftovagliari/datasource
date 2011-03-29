@@ -1,0 +1,12 @@
+bak
+tmp
+*.annot
+*.exe
+*.bak
+*.cm*
+*.obj
+*.o
+*.lib
+*.a
+ocaml-src
+.oebuild
