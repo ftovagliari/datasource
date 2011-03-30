@@ -1,0 +1,18 @@
+Datasource management, connection pooling and other postgres stuff for OCaml 
+(thanks to "PG'OCaml")
+
+COPYRIGHT:
+
+  This software is distributed under the GNU GENERAL PUBLIC LICENSE Version 3.
+  See the enclosed file COPYING for more details.
+
+
+DEPENDENCIES:
+
+  * calendar-2.0.2
+
+
+AUTHOR:
+
+  You can report bugs or give feedbacks by e-mail to
+  Francesco Tovagliari <ftovagliari@gmail.com>
