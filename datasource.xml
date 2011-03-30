@@ -1,7 +1,7 @@
 <!-- OCamlEditor XML Project -->
 <project>
   <ocaml_home></ocaml_home>
-  <ocamllib>C:\Objective Caml\lib</ocamllib>
+  <ocamllib>/usr/local/lib/ocaml</ocamllib>
   <encoding>UTF-8</encoding>
   <name>datasource</name>
   <author>Francesco Tovagliari</author>
@@ -11,7 +11,10 @@
   <version>1.0.0</version>
   <autocomp enabled="true" delay="1." cflags=""/>
   <open_files>
-    <filename offset="254" active="true">datasource.ml</filename>
+    <filename offset="1044" active="false">datasource.ml</filename>
+    <filename offset="151" active="false">fastPGOCaml.mli</filename>
+    <filename offset="151" active="false">fastPGOCaml.ml</filename>
+    <filename offset="278" active="true">/home/fran/datasource/README</filename>
   </open_files>
   <runtime/>
   <build>
@@ -21,10 +24,10 @@
       <default>true</default>
       <byt>true</byt>
       <opt>true</opt>
-      <libs>calendar</libs>
+      <libs></libs>
       <other_objects></other_objects>
       <files>datasource.ml</files>
-      <includes>+calendar</includes>
+      <includes></includes>
       <thread>true</thread>
       <vmthread>false</vmthread>
       <pp></pp>
@@ -41,7 +44,7 @@
       <default>false</default>
       <byt>true</byt>
       <opt>true</opt>
-      <libs>calendar</libs>
+      <libs>calendarLib</libs>
       <other_objects></other_objects>
       <files>postgres.ml</files>
       <includes>+calendar</includes>

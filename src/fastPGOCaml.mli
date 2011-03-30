@@ -2,6 +2,8 @@
  * $Id: pGOCaml.mli,v 1.10 2006/02/19 22:51:17 rich Exp $
  *)
 
+open CalendarLib
+
 type 'a t				(** Database handle. *)
 
 exception Error of string

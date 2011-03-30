@@ -2,6 +2,7 @@
  * $Id: pGOCaml.ml,v 1.21 2007/02/24 17:27:24 rich Exp $
  *)
 
+open CalendarLib
 open Printf
 
 type 'a t = {
@@ -876,7 +877,7 @@ let rec finish conn =
     | DataRow _ -> finish conn
     | DataRowIgnore -> finish conn
     | NoData -> finish conn
-    | ParameterStatus _ -> 
+    | ParameterStatus _ ->
      (* 43.2.6: ParameterStatus messages will be generated whenever
       * the active value changes for any of the parameters the backend
       * believes the frontend should know about. Most commonly this
