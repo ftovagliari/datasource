@@ -425,7 +425,8 @@ let parse_backend_message ?(ignore_data=false) (typ, msg) =
               let len = Int32.to_int len in
               if len > Sys.max_string_length then raise (Error "FastPGOCaml: result field is too wide for string");
               if len = 0 then fields.(i) <- Some "" else begin
-                fields.(i) <- Some (get_n_bytes len)
+                (*fields.(i) <- Some (get_n_bytes len)*)
+                Array.unsafe_set fields i (Some (get_n_bytes len))
               end
             end
   	done;
@@ -876,7 +877,7 @@ let rec finish conn =
     | DataRow _ -> finish conn
     | DataRowIgnore -> finish conn
     | NoData -> finish conn
-    | ParameterStatus _ -> 
+    | ParameterStatus _ ->
      (* 43.2.6: ParameterStatus messages will be generated whenever
       * the active value changes for any of the parameters the backend
       * believes the frontend should know about. Most commonly this

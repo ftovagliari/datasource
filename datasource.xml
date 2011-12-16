@@ -11,7 +11,15 @@
   <version>1.0.0</version>
   <autocomp enabled="true" delay="1." cflags=""/>
   <open_files>
-    <filename offset="254" active="true">datasource.ml</filename>
+    <filename offset="741" active="false">datasource.ml</filename>
+    <filename offset="1763" active="false">pool.ml</filename>
+    <filename offset="742" active="false">S3.ml</filename>
+    <filename offset="762" active="false">datasource.mli</filename>
+    <filename offset="12857" active="true">fastPGOCaml.ml</filename>
+    <filename offset="0" active="false">fastPGOCaml.mli</filename>
+    <filename offset="742" active="false">pool.mli</filename>
+    <filename offset="742" active="false">postgres.ml</filename>
+    <filename offset="768" active="false">postgres.mli</filename>
   </open_files>
   <runtime/>
   <build>
@@ -30,7 +38,7 @@
       <pp></pp>
       <cflags>-w sy -g</cflags>
       <lflags></lflags>
-      <is_library>true</is_library>
+      <outkind>Library</outkind>
       <outname>datasource</outname>
       <lib_install_path>datasource</lib_install_path>
       <external_tasks/>
@@ -50,7 +58,7 @@
       <pp></pp>
       <cflags>-w sy -g</cflags>
       <lflags></lflags>
-      <is_library>true</is_library>
+      <outkind>Library</outkind>
       <outname>pgdatasource</outname>
       <lib_install_path>datasource</lib_install_path>
       <external_tasks/>
