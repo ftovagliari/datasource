@@ -1,4 +1,4 @@
-Datasource management, connection pooling and other postgres stuff for OCaml 
+Datasource management, connection pooling and other postgres stuff for OCaml
 (thanks to "PG'OCaml")
 
 COPYRIGHT:
@@ -9,7 +9,7 @@ COPYRIGHT:
 
 DEPENDENCIES:
 
-  * calendar-2.0.2
+  * calendar-2.03.1
 
 
 AUTHOR:
