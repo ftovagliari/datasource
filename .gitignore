@@ -10,3 +10,4 @@ tmp
 *.a
 ocaml-src
 .oebuild
+.cache

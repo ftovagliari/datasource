@@ -426,7 +426,8 @@ let parse_backend_message ?(ignore_data=false) (typ, msg) =
               let len = Int32.to_int len in
               if len > Sys.max_string_length then raise (Error "FastPGOCaml: result field is too wide for string");
               if len = 0 then fields.(i) <- Some "" else begin
-                fields.(i) <- Some (get_n_bytes len)
+                (*fields.(i) <- Some (get_n_bytes len)*)
+                Array.unsafe_set fields i (Some (get_n_bytes len))
               end
             end
   	done;
