@@ -11,10 +11,9 @@
   <version>1.0.0</version>
   <autocomp enabled="true" delay="1." cflags=""/>
   <open_files>
-    <filename offset="1044" active="false">datasource.ml</filename>
-    <filename offset="151" active="false">fastPGOCaml.mli</filename>
-    <filename offset="151" active="false">fastPGOCaml.ml</filename>
-    <filename offset="278" active="true">/home/fran/datasource/README</filename>
+    <filename offset="0" active="false">datasource.mli</filename>
+    <filename offset="0" active="false">datasource.ml</filename>
+    <filename offset="0" active="true">postgres.ml</filename>
   </open_files>
   <runtime/>
   <build>
@@ -33,7 +32,7 @@
       <pp></pp>
       <cflags>-w sy -g</cflags>
       <lflags></lflags>
-      <is_library>true</is_library>
+      <outkind>Library</outkind>
       <outname>datasource</outname>
       <lib_install_path>datasource</lib_install_path>
       <external_tasks/>
@@ -47,13 +46,13 @@
       <libs>calendarLib</libs>
       <other_objects></other_objects>
       <files>postgres.ml</files>
-      <includes>+calendar</includes>
+      <includes>+site-lib/calendar</includes>
       <thread>true</thread>
       <vmthread>false</vmthread>
       <pp></pp>
       <cflags>-w sy -g</cflags>
       <lflags></lflags>
-      <is_library>true</is_library>
+      <outkind>Library</outkind>
       <outname>pgdatasource</outname>
       <lib_install_path>datasource</lib_install_path>
       <external_tasks/>
