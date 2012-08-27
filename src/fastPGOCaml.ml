@@ -2,7 +2,7 @@
  * $Id: pGOCaml.ml,v 1.21 2007/02/24 17:27:24 rich Exp $
  *)
 
-open CalendarLib
+open Calendar(*Lib*)
 open Printf
 
 type 'a t = {

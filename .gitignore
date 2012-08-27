@@ -11,3 +11,5 @@ tmp
 ocaml-src
 .oebuild
 .cache
+test.jpg
+.tmp

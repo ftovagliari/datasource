@@ -82,7 +82,8 @@ let memo ~f =
       Hashtbl.add memo key data;
       data
 
-
+(** Do not use this function and do not use [FastPGOCaml.string_of_bytea].
+    @Deprecated Use [Postgres.string_of_bytea]. *)
 let escape_slow str =
   let result = ref [] in
   String.iter begin function
@@ -96,8 +97,8 @@ let escape_slow str =
   end str;
   String.concat "" (List.rev !result)
 
-(** escape *)
-let escape =
+(** string_of_bytea *)
+let string_of_bytea =
   let find n = List.assoc n [0, "0"; 1, "1"; 2, "2"; 3, "3"; 4 , "4"; 5, "5"; 6, "6"; 7, "7"] in
   let rec octal n =
     if n < 8 then find n else begin
@@ -122,9 +123,13 @@ let escape =
     for i = 0 to len - 1 do
       Buffer.add_string result (escape_char (String.unsafe_get str i));
     done;
-    Buffer.contents result
+    Buffer.contents result;;
 
-(** escape_chan *)
+(** Alias for [Postgres.string_of_bytea].
+    @deprecated Use [Postgres.string_of_bytea] *)
+let escape = string_of_bytea;;
+
+(*(** escape_chan *)
 let escape_chan ?(bufsize=4096) inchan =
   let rbuf = Buffer.create bufsize in
   let result = ref [] in
@@ -149,10 +154,28 @@ let escape_chan ?(bufsize=4096) inchan =
       done;
     with End_of_file -> (result := Buffer.contents rbuf :: !result)
   end;
-  List.rev !result
+  List.rev !result*)
 
-(** unescape *)
-let unescape =
+(** string_of_bytea_chan_func *)
+let string_of_bytea_chan_func ?(bufsize=4096) inchan f =
+  let buf = String.create bufsize in
+  begin
+    try
+      while true do
+        let len = input inchan buf 0 bufsize in
+        if len = 0 then raise Exit else (f (string_of_bytea (String.sub buf 0 len)))
+      done;
+    with Exit -> ()
+  end;;
+
+(** string_of_bytea_chan *)
+let string_of_bytea_chan ?bufsize inchan =
+  let chunks = ref [] in
+  string_of_bytea_chan_func ?bufsize inchan (fun chunk -> chunks := chunk :: !chunks);
+  List.rev !chunks;;
+
+(** bytea_of_string *)
+let bytea_of_string =
   let char (c1, c2, c3) =
     let code = String.make 5 '0' in
     String.unsafe_set code 1 'o';
@@ -184,8 +207,11 @@ let unescape =
         | c -> Buffer.add_char buf c);
       incr i;
     done;
-    Buffer.contents buf
+    Buffer.contents buf;;
 
+(** Alias for [Postgres.bytea_of_string].
+    @Deprecated Use [Postgres.bytea_of_string] *)
+let unescape = bytea_of_string
 
 module SimpleQuery (*: Datasource.SIMPLE_QUERY*) =
   struct

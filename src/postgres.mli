@@ -20,10 +20,11 @@
 
 *)
 
+
 module Datasource :
   sig
-    type t
     type connection = unit FastPGOCaml.t
+    type t
     val verbose : int ref
     val create :
       host:string ->
@@ -38,27 +39,30 @@ module Datasource :
     val clear_pool : t -> unit
     val pool_size : t -> int * int
   end
-val escape : string -> string
-val escape_chan : ?bufsize:int -> in_channel -> string list
-val unescape : string -> string
 val read_file : string -> string
+val string_of_bytea : string -> string
 
+(** Alias for [Postgres.string_of_bytea].
+    @deprecated Use [Postgres.string_of_bytea] *)
+val escape : string -> string
 
+val string_of_bytea_chan_func : ?bufsize:int -> in_channel -> (string -> 'a) -> unit
+val string_of_bytea_chan : ?bufsize:int -> in_channel -> string list
+
+val bytea_of_string : string -> string
+
+(** Alias for [Postgres.bytea_of_string].
+    @Deprecated Use [Postgres.bytea_of_string] *)
+val unescape : string -> string
 module SimpleQuery :
   sig
     val query :
       datasource:Datasource.t ->
       ?name:string ->
       sql:string ->
-      ?params:string option list ->
-      (string option array -> unit) ->
-      unit
-
+      ?params:string option list -> (string option array -> 'a) -> unit
     val query_first :
       datasource:Datasource.t ->
       ?name:string ->
-      sql:string ->
-      ?params:string option list ->
-      unit ->
-      string option
+      sql:string -> ?params:string option list -> unit -> string option
   end
