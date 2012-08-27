@@ -13,3 +13,4 @@ ocaml-src
 .cache
 test.jpg
 .tmp
+datasource.project.local
