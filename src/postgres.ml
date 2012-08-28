@@ -190,21 +190,20 @@ let bytea_of_string =
     let buf = Buffer.create (String.length str / 5) in
     let i = ref 0 in
     while !i < String.length str do
-      (match String.unsafe_get str !i with
-        | '\\' ->
-          let next1 = incr i; String.unsafe_get str !i in
-          if next1 = apo then Buffer.add_char buf apo
-          else begin (* next1 deve essere '\\' *)
-            let next2 = incr i; String.unsafe_get str !i in
-            let next3 = incr i; String.unsafe_get str !i in
-            if next2 = bs && next3 = bs then
-              Buffer.add_char buf bs
-            else begin
-              let next4 = incr i; String.unsafe_get str !i in
-              Buffer.add_char buf (char (next2, next3, next4))
-            end
+      let ch = String.unsafe_get str !i in
+      if ch = bs then begin
+        let next1 = incr i; String.unsafe_get str !i in
+        if next1 = apo then Buffer.add_char buf apo
+        else begin (* next1 deve essere '\\' *)
+          let next2 = incr i; String.unsafe_get str !i in
+          let next3 = incr i; String.unsafe_get str !i in
+          if next2 = bs && next3 = bs then Buffer.add_char buf bs
+          else begin
+            let next4 = incr i; String.unsafe_get str !i in
+            Buffer.add_char buf (char (next2, next3, next4))
           end
-        | c -> Buffer.add_char buf c);
+        end
+      end else (Buffer.add_char buf ch);
       incr i;
     done;
     Buffer.contents buf;;
