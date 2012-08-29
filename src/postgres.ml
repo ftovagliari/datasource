@@ -22,51 +22,52 @@
 
 module PGOCaml = FastPGOCaml
 
-module Datasource = Datasource.Make (
-  struct
-    type connection = unit PGOCaml.t
-    let connect ~host ~port ~user ~password ~database () =
-      PGOCaml.connect ~host ~port ~user ~password ~database ()
-    let disconnect = PGOCaml.close;
-  end
-)
+module Datasource = Datasource.Make (struct
+  type connection = unit PGOCaml.t
+  let connect ~host ~port ~user ~password ~database () =
+    PGOCaml.connect ~host ~port ~user ~password ~database ()
+  let disconnect = PGOCaml.close;
+end);;
+
+module Util = struct
+  let replace_all re subst str =
+    let search = Str.search_backward re str in
+    let result = ref [] in
+    let pos = ref (String.length str) in
+    let prec = ref !pos in
+    begin
+      try
+        while true do
+          decr pos;
+          if !pos < 0 then raise Not_found;
+          pos := search !pos;
+          let matched = Str.matched_string str in
+          let end_matched = !pos + (String.length matched) in
+          if end_matched <= !prec then begin
+            result := (subst str) :: (String.sub str end_matched (!prec - end_matched)) :: !result;
+            prec := !pos;
+          end
+        done
+      with Not_found -> result := (String.sub str 0 (!pos + 1)) :: !result;
+    end;
+    String.concat "" !result;;
+
+  (** read_file *)
+  let read_file filename =
+    let ichan = open_in_bin filename in
+    let finally () = close_in ichan in
+    try
+      let length = in_channel_length ichan in
+      let data = Buffer.create length in
+      Buffer.add_channel data ichan length;
+      finally ();
+      Buffer.contents data;
+    with ex -> (finally(); raise ex);;
+end
 
 (** Iterativa *)
-let replace_all re subst str =
-  let search = Str.search_backward re str in
-  let result = ref [] in
-  let pos = ref (String.length str) in
-  let prec = ref !pos in
-  begin
-    try
-      while true do
-        decr pos;
-        if !pos < 0 then raise Not_found;
-        pos := search !pos;
-        let matched = Str.matched_string str in
-        let end_matched = !pos + (String.length matched) in
-        if end_matched <= !prec then begin
-          result := (subst str) :: (String.sub str end_matched (!prec - end_matched)) :: !result;
-          prec := !pos;
-        end
-      done
-    with Not_found -> result := (String.sub str 0 (!pos + 1)) :: !result;
-  end;
-  String.concat "" !result
 
-
-let read_file filename =
-  let ichan = open_in_bin filename in
-  let finally () = close_in ichan in
-  try
-    let length = in_channel_length ichan in
-    let data = Buffer.create length in
-    Buffer.add_channel data ichan length;
-    finally ();
-    Buffer.contents data;
-  with ex -> (finally(); raise ex)
-
-
+(** memo *)
 let memo ~f =
   let memo = Hashtbl.create 1 in
   fun ?(force=fun _ -> false) key ->
@@ -80,22 +81,7 @@ let memo ~f =
     with Not_found ->
       let data = f key in
       Hashtbl.add memo key data;
-      data
-
-(** Do not use this function and do not use [FastPGOCaml.string_of_bytea].
-    @Deprecated Use [Postgres.string_of_bytea]. *)
-let escape_slow str =
-  let result = ref [] in
-  String.iter begin function
-    | '\'' -> result := "\\\\047" :: !result
-    | '\\' -> result := "\\\\134" :: !result (* Backslash SI *)
-    | c ->
-      let dec = Char.code c in
-      let repl = if dec > 31 && dec < 127 then String.make 1 c
-      else Printf.sprintf "\\\\%03o" dec in
-      result := repl :: !result
-  end str;
-  String.concat "" (List.rev !result)
+      data;;
 
 (** string_of_bytea *)
 let string_of_bytea =
@@ -125,8 +111,7 @@ let string_of_bytea =
     done;
     Buffer.contents result;;
 
-(** Alias for [Postgres.string_of_bytea].
-    @deprecated Use [Postgres.string_of_bytea] *)
+(** Alias for [Postgres.string_of_bytea]. *)
 let escape = string_of_bytea;;
 
 (*(** escape_chan *)
@@ -175,6 +160,8 @@ let string_of_bytea_chan ?bufsize inchan =
   List.rev !chunks;;
 
 (** bytea_of_string *)
+type unescape_result = Complete of string | Partial of string
+
 let bytea_of_string =
   let char (c1, c2, c3) =
     let code = String.make 5 '0' in
@@ -189,29 +176,39 @@ let bytea_of_string =
   fun str ->
     let buf = Buffer.create (String.length str / 5) in
     let i = ref 0 in
-    while !i < String.length str do
-      let ch = String.unsafe_get str !i in
-      if ch = bs then begin
-        let next1 = incr i; String.unsafe_get str !i in
-        if next1 = apo then Buffer.add_char buf apo
-        else begin (* next1 deve essere '\\' *)
-          let next2 = incr i; String.unsafe_get str !i in
-          let next3 = incr i; String.unsafe_get str !i in
-          if next2 = bs && next3 = bs then Buffer.add_char buf bs
-          else begin
-            let next4 = incr i; String.unsafe_get str !i in
-            Buffer.add_char buf (char (next2, next3, next4))
-          end
-        end
-      end else (Buffer.add_char buf ch);
-      incr i;
-    done;
-    Buffer.contents buf;;
+    begin
+      try
+        while !i < String.length str do
+          let ch = String.unsafe_get str !i in
+          if ch = bs then begin
+            let next1 = incr i; String.unsafe_get str !i in
+            if next1 = apo then Buffer.add_char buf apo
+            else begin (* next1 deve essere '\\' *)
+              let next2 = incr i; String.unsafe_get str !i in
+              let next3 = incr i; String.unsafe_get str !i in
+              if next2 = bs && next3 = bs then Buffer.add_char buf bs
+              else begin
+                let next4 = incr i; String.unsafe_get str !i in
+                Buffer.add_char buf (char (next2, next3, next4))
+              end
+            end
+          end else (Buffer.add_char buf ch);
+          incr i;
+        done;
+        Complete (Buffer.contents buf)
+      with Failure "int_of_string" -> Partial (Buffer.contents buf)
+    end;;
 
-(** Alias for [Postgres.bytea_of_string].
-    @Deprecated Use [Postgres.bytea_of_string] *)
+(** Alias for [Postgres.bytea_of_string]. *)
 let unescape = bytea_of_string
 
+(** unescape_unsafe *)
+let unescape_unsafe data =
+  match bytea_of_string data with
+    | Partial data -> data
+    | Complete data -> data;;
+
+(** SimpleQuery *)
 module SimpleQuery (*: Datasource.SIMPLE_QUERY*) =
   struct
 
