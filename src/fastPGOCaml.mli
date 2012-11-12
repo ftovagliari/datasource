@@ -2,7 +2,7 @@
  * $Id: pGOCaml.mli,v 1.10 2006/02/19 22:51:17 rich Exp $
  *)
 
-open Calendar(*Lib*)
+open CalendarLib
 
 type 'a t				(** Database handle. *)
 

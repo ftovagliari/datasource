@@ -18,6 +18,7 @@
       <libs></libs>
       <other_objects></other_objects>
       <files>datasource.ml</files>
+      <package></package>
       <includes></includes>
       <thread>true</thread>
       <vmthread>false</vmthread>
@@ -38,7 +39,8 @@
       <libs></libs>
       <other_objects></other_objects>
       <files>postgres.ml</files>
-      <includes>+calendar</includes>
+      <package>calendar</package>
+      <includes></includes>
       <thread>true</thread>
       <vmthread>false</vmthread>
       <pp></pp>
@@ -57,5 +59,6 @@
   <build_script filename="_build.ml">
     <targets/>
     <args/>
+    <commands/>
   </build_script>
 </project>
