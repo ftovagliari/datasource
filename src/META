@@ -1,0 +1,16 @@
+name="datasource"
+version="1.0"
+description="Datasource management and connection pooling."
+requires=""
+archive(byte)="datasource.cma"
+archive(native)="datasource.cmxa"
+
+package "pg" (
+  version="1.0"
+  description="Fast PostgreSQL driver based upon PG'OCaml."
+  requires = "calendar,datasource"
+  archive(byte)="pgdatasource.cma"
+  archive(native)="pgdatasource.cmxa"
+)
+
+
