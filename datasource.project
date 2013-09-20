@@ -25,6 +25,7 @@
       <pp></pp>
       <inline></inline>
       <nodep>false</nodep>
+      <dontlinkdep>false</dontlinkdep>
       <cflags>-w sy -g</cflags>
       <lflags>-g</lflags>
       <target_type>Library</target_type>
@@ -47,6 +48,7 @@
       <pp></pp>
       <inline></inline>
       <nodep>false</nodep>
+      <dontlinkdep>false</dontlinkdep>
       <cflags>-w sy -g</cflags>
       <lflags>-g</lflags>
       <target_type>Library</target_type>
@@ -69,6 +71,7 @@
       <pp></pp>
       <inline></inline>
       <nodep>false</nodep>
+      <dontlinkdep>false</dontlinkdep>
       <cflags></cflags>
       <lflags></lflags>
       <target_type>Executable</target_type>
