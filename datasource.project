@@ -12,7 +12,8 @@
   <version>1.0.0</version>
   <autocomp enabled="true" delay="1." cflags=""/>
   <targets>
-    <target name="datasource" default="true" id="0">
+    <target name="datasource" default="true" id="0" sub_targets="">
+      <descr></descr>
       <byt>true</byt>
       <opt>true</opt>
       <libs></libs>
@@ -35,12 +36,13 @@
       <restrictions></restrictions>
       <dependencies></dependencies>
     </target>
-    <target name="pgdatasource" default="false" id="1">
+    <target name="pgdatasource" default="false" id="1" sub_targets="">
+      <descr></descr>
       <byt>true</byt>
       <opt>true</opt>
       <libs></libs>
       <other_objects></other_objects>
-      <files>postgres.ml</files>
+      <files>postgreSQL.ml postgres.ml</files>
       <package>calendar</package>
       <includes></includes>
       <thread>true</thread>
@@ -58,7 +60,8 @@
       <restrictions></restrictions>
       <dependencies>0</dependencies>
     </target>
-    <target name="Tools" default="false" id="2">
+    <target name="Tools" default="false" id="2" sub_targets="">
+      <descr></descr>
       <byt>true</byt>
       <opt>false</opt>
       <libs></libs>

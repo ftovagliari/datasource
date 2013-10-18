@@ -20,71 +20,11 @@
 
 *)
 
-module PGOCaml = FastPGOCaml
 
-module Datasource = Datasource.Make (struct
-  type connection = unit PGOCaml.t
-  let connect ~host ~port ~user ~password ~database () =
-    PGOCaml.connect ~host ~port ~user ~password ~database ()
-  let disconnect = PGOCaml.close;
-end);;
+open DatasourceUtil
 
-module Util = struct
-  let replace_all re subst str =
-    let search = Str.search_backward re str in
-    let result = ref [] in
-    let pos = ref (String.length str) in
-    let prec = ref !pos in
-    begin
-      try
-        while true do
-          decr pos;
-          if !pos < 0 then raise Not_found;
-          pos := search !pos;
-          let matched = Str.matched_string str in
-          let end_matched = !pos + (String.length matched) in
-          if end_matched <= !prec then begin
-            result := (subst str) :: (String.sub str end_matched (!prec - end_matched)) :: !result;
-            prec := !pos;
-          end
-        done
-      with Not_found -> result := (String.sub str 0 (!pos + 1)) :: !result;
-    end;
-    String.concat "" !result;;
-
-  (** read_file *)
-  let read_file filename =
-    let ichan = open_in_bin filename in
-    let finally () = close_in ichan in
-    try
-      let length = in_channel_length ichan in
-      let data = Buffer.create length in
-      Buffer.add_channel data ichan length;
-      finally ();
-      Buffer.contents data;
-    with ex -> (finally(); raise ex);;
-end
-
-(** Iterativa *)
-
-(** memo *)
-let memo ~f =
-  let memo = Hashtbl.create 1 in
-  fun ?(force=fun _ -> false) key ->
-    try
-      let data = Hashtbl.find memo key in
-      if force data then begin
-        Hashtbl.remove memo key;
-        raise Not_found;
-      end;
-      data
-    with Not_found ->
-      let data = f key in
-      Hashtbl.add memo key data;
-      data;;
-
-(** string_of_bytea *)
-let string_of_bytea =
+(** string_of_bytea_from_string *)
+let string_of_bytea_from_string =
   let find n = List.assoc n [0, "0"; 1, "1"; 2, "2"; 3, "3"; 4 , "4"; 5, "5"; 6, "6"; 7, "7"] in
   let rec octal n =
     if n < 8 then find n else begin
@@ -111,11 +51,20 @@ let string_of_bytea =
     done;
     Buffer.contents result;;
 
-(** Alias for [Postgres.string_of_bytea]. *)
-let escape = string_of_bytea;;
+(** iter_bytea_from_channel *)
+let iter_bytea_from_channel ?(bufsize=4096) inchan f =
+  let buf = String.create bufsize in
+  begin
+    try
+      while true do
+        let len = input inchan buf 0 bufsize in
+        if len = 0 then raise Exit else (f (string_of_bytea_from_string (String.sub buf 0 len)))
+      done;
+    with Exit -> ()
+  end;;
 
 (*(** escape_chan *)
-let escape_chan ?(bufsize=4096) inchan =
+  let escape_chan ?(bufsize=4096) inchan =
   let rbuf = Buffer.create bufsize in
   let result = ref [] in
   let buf = String.create bufsize in
@@ -141,23 +90,14 @@ let escape_chan ?(bufsize=4096) inchan =
   end;
   List.rev !result*)
 
-(** string_of_bytea_chan_func *)
-let string_of_bytea_chan_func ?(bufsize=4096) inchan f =
-  let buf = String.create bufsize in
-  begin
-    try
-      while true do
-        let len = input inchan buf 0 bufsize in
-        if len = 0 then raise Exit else (f (string_of_bytea (String.sub buf 0 len)))
-      done;
-    with Exit -> ()
-  end;;
-
-(** string_of_bytea_chan *)
-let string_of_bytea_chan ?bufsize inchan =
+(** string_of_bytea_from_channel *)
+let string_of_bytea_from_channel ?bufsize inchan =
   let chunks = ref [] in
-  string_of_bytea_chan_func ?bufsize inchan (fun chunk -> chunks := chunk :: !chunks);
+  iter_bytea_from_channel ?bufsize inchan (fun chunk -> chunks := chunk :: !chunks);
   List.rev !chunks;;
+
+(** Alias for [string_of_bytea_from_string]. *)
+let escape = string_of_bytea_from_string;;
 
 (** bytea_of_string *)
 type unescape_result = Complete of string | Partial of string
@@ -207,58 +147,3 @@ let unescape_unsafe data =
   match bytea_of_string data with
     | Partial data -> data
     | Complete data -> data;;
-
-(** SimpleQuery *)
-module SimpleQuery (*: Datasource.SIMPLE_QUERY*) =
-  struct
-
-    let query ~datasource ?name ~sql ?(params=[]) callback =
-      (*Printf.printf "%s\n%!" query;*)
-      let con = Datasource.get_connection datasource in
-      let finally () =
-        PGOCaml.close_statement ?name con ();
-        Datasource.release_connection datasource con;
-      in
-      try
-        let stmt = PGOCaml.prepare con ?name ~query:sql () in
-        let rs = PGOCaml.execute con ?name ~params () in
-        begin
-          try
-            while true do callback (PGOCaml.next rs) done
-          with PGOCaml.Ready_for_query -> ()
-        end;
-        finally()
-      with ex -> (finally(); raise ex)
-
-    let query_first ~datasource ?name ~sql ?(params=[]) () =
-      let con = Datasource.get_connection datasource in
-      let finally () =
-        PGOCaml.close_statement ?name con ();
-        Datasource.release_connection datasource con;
-      in
-      try
-        let stmt = PGOCaml.prepare con ?name ~query:sql () in
-        let rs = PGOCaml.execute con ?name ~params () in
-        let result =
-          try
-            let row = PGOCaml.next rs in
-            if Array.length row = 0 then None else row.(0)
-          with PGOCaml.Ready_for_query -> None
-        in
-        finally();
-        result
-      with ex -> (finally(); raise ex)
-
-  end
-
-
-
-
-
-
-
-
-
-
-
-

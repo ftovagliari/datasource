@@ -1,7 +1,7 @@
 (*
 
   "datasource"
-  Copyright (C) 2010, 2011 Francesco Tovagliari
+  Copyright (C) 2010-2013 Francesco Tovagliari
 
   This file is part of "datasource".
 
