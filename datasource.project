@@ -56,7 +56,24 @@
       <target_type>Library</target_type>
       <outname>pgdatasource</outname>
       <lib_install_path>datasource</lib_install_path>
-      <external_tasks/>
+      <external_tasks>
+        <task name="ocamldoc">
+          <always_run_in_project>true</always_run_in_project>
+          <always_run_in_script>true</always_run_in_script>
+          <env replace="false"/>
+          <dir></dir>
+          <cmd>ocamlfind</cmd>
+          <args>
+            <arg enabled="true">ocamldoc</arg>
+            <arg enabled="true">*.mli</arg>
+            <arg enabled="true">-t &quot;datasource&quot;</arg>
+            <arg enabled="true">-d ../doc</arg>
+            <arg enabled="true">-html</arg>
+            <arg enabled="true">-package calendar</arg>
+          </args>
+          <phase>After_compile</phase>
+        </task>
+      </external_tasks>
       <restrictions></restrictions>
       <dependencies>0</dependencies>
     </target>

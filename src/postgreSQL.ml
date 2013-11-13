@@ -30,7 +30,7 @@ module Datasource = Datasource.Make (
 
 module Escape = struct include Pg_escape end
 
-module Make (X : sig val datasource : Datasource.t end) = struct
+module Make (DATASOURCE : sig val datasource : Datasource.t end) = struct
 
   open DatasourceUtil
   open Printf
@@ -38,14 +38,14 @@ module Make (X : sig val datasource : Datasource.t end) = struct
 
   let get_connection () =
     let rec try_connect attempts =
-      try Datasource.get_connection X.datasource
+      try Datasource.get_connection DATASOURCE.datasource
       with Unix.Unix_error (err, a, b) as ex ->
         if attempts = 0 then (raise ex) else (try_connect (attempts - 1))
     in try_connect 10
 
-  let release_connection = Datasource.release_connection X.datasource
-  let clear_pool () = Datasource.clear_pool X.datasource
-  let pool_size () = Datasource.pool_size X.datasource
+  let release_connection = Datasource.release_connection DATASOURCE.datasource
+  let clear_pool () = Datasource.clear_pool DATASOURCE.datasource
+  let pool_size () = Datasource.pool_size DATASOURCE.datasource
 
   let escape_sql_char =
     let re = Str.regexp "'" in

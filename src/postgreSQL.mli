@@ -1,4 +1,6 @@
-(** {6 Datasource for PostgreSQL connections} *)
+(** {6 PostgreSQL functions} *)
+
+(** {7 Datasource for PostgreSQL connections} *)
 module Datasource :
   sig
     type t
@@ -18,7 +20,7 @@ module Datasource :
     val pool_size : t -> int * int
   end
 
-(** {4 Escaping and unescaping [bytea] strings } *)
+(** {7 Escaping and unescaping [bytea] strings } *)
 module Escape :
   sig
     val string_of_bytea_from_string : string -> string
@@ -36,12 +38,17 @@ module Escape :
     val unescape_unsafe : string -> string
   end
 
-(**  *)
+(** {7 Functorial interface} *)
 module Make :
-  functor (X : sig val datasource : Datasource.t end) ->
+  functor (DATASOURCE : sig val datasource : Datasource.t end) ->
     sig
+      (** Get a connection from the connection pool. *)
       val get_connection : unit -> Datasource.connection
+
+      (** Release a connection to the connection pool. *)
       val release_connection : Datasource.connection -> unit
+
+      (**  *)
       val clear_pool : unit -> unit
       val pool_size : unit -> int * int
       val escape_sql_char : string -> string
@@ -69,25 +76,42 @@ module Make :
       val bind_bool : bool -> string option
       val bind_timestamp : float -> string
       val bind_timestamp_opt : float option -> string option
+
+      (** Returns the first value of the first result returned by the query. *)
       val select_first :
         ?db:Datasource.connection -> ?name:string -> string -> string option
+
       val select_first_2 :
         ?db:Datasource.connection ->
         ?name:string -> string -> (string option * string option) option
+
       val select_first_3 :
         ?db:Datasource.connection ->
         ?name:string ->
         string -> (string option * string option * string option) option
+
       val select_first_4 :
         ?db:Datasource.connection ->
         ?name:string ->
         string ->
         (string option * string option * string option * string option)
         option
+
+      (** Returns the first result returned by the query. *)
       val select_first_array :
         ?db:Datasource.connection ->
         ?name:string ->
         ?params:string option list -> string -> string option array
+
+      (** [select_iter func query] applies [func] to every result returned by
+          the [query]. When [func] returns [true] the loop that iterates over
+          the result set is interrupted and [select_iter] terminates.
+
+          @param db The database connection used for the query; when not given,
+                    a new connection is taken from the pool.
+          @param params Parameters passed to the SQL query.
+          @param meta Reference to the query metadata that can be used by [func].
+        *)
       val select_iter :
         ?db:Datasource.connection ->
         ?name:string ->
@@ -96,17 +120,41 @@ module Make :
               option ref ->
         ?params:string option list ->
         (string option array -> bool) -> string -> unit
+
+      (** [prepare_and_exec db query] prepare and executes [query] using the
+          given database connection [db].
+          @param params Parameters passed to the query. The query is prepared
+          before it is executed and it is executed for each paramaters list in
+          the given parameters list of lists.
+          @param returning A function applied to the query result (if any).
+        *)
       val prepare_and_exec :
         'a FastPGOCaml.t ->
         ?name:string ->
         ?params:string option list list ->
         ?returning:('a FastPGOCaml.result_set -> unit) -> string -> unit
+
       val new_savepoint_name : unit -> string
+
+      (** Executes the given function inside a transaction, in case of exception
+          the transaction is rolled-back otherwise it is committed.
+        *)
       val execute_transaction : (Datasource.connection -> 'a) -> 'a
-      val count_results : db:Datasource.connection -> string -> int
+
+      (** Gets a connection from the pool, executes the given function and
+          releases the connection to the pool. *)
       val with_connection : (Datasource.connection -> 'a) -> 'a
+
+      (** Counts the number of results that the given [SELECT] statement would return
+          if executed. The result is obtained by executing the query obtained
+          by replacing [COUNT( * )] in the SELECT part of the given statement.
+        *)
+      val count_results : db:Datasource.connection -> string -> int
+
       type value = NULL | TIMESTAMP of float | TEXT of string
+
       val create_update_set : (string * value option) list -> string
+
       val get_column_names :
         db:Datasource.connection -> tabname:string -> string list
     end

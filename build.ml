@@ -27,6 +27,18 @@ let cmd_line_args = [
 let external_tasks = [
   
   0, (fun command -> {
+    et_name                  = "ocamldoc";
+    et_env                   = [];
+    et_env_replace           = false;
+    et_dir                   = "";
+    et_cmd                   = "ocamlfind";
+    et_args                  = [true,"ocamldoc"; true,"*.mli"; true,"-t \"datasource\""; true,"-d ../doc"; true,"-html"; true,"-package calendar"];
+    et_phase                 = Some After_compile;
+    et_always_run_in_project = true;
+    et_always_run_in_script  = true;
+  });
+  
+  1, (fun command -> {
     et_name                  = "Distclean";
     et_env                   = [];
     et_env_replace           = false;
@@ -38,7 +50,7 @@ let external_tasks = [
     et_always_run_in_script  = false;
   });
   
-  1, (fun command -> {
+  2, (fun command -> {
     et_name                  = "Findlib-install";
     et_env                   = [];
     et_env_replace           = false;
@@ -50,7 +62,7 @@ let external_tasks = [
     et_always_run_in_script  = false;
   });
   
-  2, (fun command -> {
+  3, (fun command -> {
     et_name                  = "Findlib-uninstall";
     et_env                   = [];
     et_env_replace           = false;
@@ -65,9 +77,9 @@ let external_tasks = [
 
 
 let general_commands = [
-  `Distclean, (0, "Distclean");
-  `Install, (1, "Findlib-install");
-  `Uninstall, (2, "Findlib-uninstall");
+  `Distclean, (1, "Distclean");
+  `Install, (2, "Findlib-install");
+  `Uninstall, (3, "Findlib-uninstall");
 ]
 
 
@@ -127,7 +139,7 @@ let targets = [
     dontlinkdep          = false;
     library_install_dir  = "datasource"; (* Relative to the Standard Library Directory *)
     other_objects        = "";
-    external_tasks       = [];
+    external_tasks       = [0];
     restrictions         = [];
     dependencies         = [0];
     show                 = true;
@@ -156,7 +168,7 @@ let targets = [
     dontlinkdep          = false;
     library_install_dir  = ""; (* Relative to the Standard Library Directory *)
     other_objects        = "";
-    external_tasks       = [0; 1; 2];
+    external_tasks       = [1; 2; 3];
     restrictions         = [];
     dependencies         = [];
     show                 = false;
