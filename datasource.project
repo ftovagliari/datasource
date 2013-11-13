@@ -42,7 +42,7 @@
       <opt>true</opt>
       <libs></libs>
       <other_objects></other_objects>
-      <files>postgreSQL.ml postgres.ml</files>
+      <files>postgreSQL.ml</files>
       <package>calendar</package>
       <includes></includes>
       <thread>true</thread>

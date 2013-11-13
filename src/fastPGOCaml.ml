@@ -678,8 +678,13 @@ let password = Digest.string password in*)
 let close conn =
   (* Be nice and send the terminate message. *)
   let msg = new_message 'X' in
-  send_message conn msg;
-  flush conn.chan;
+(*  begin
+    try*)
+      send_message conn msg;
+      flush conn.chan;
+    (*with (Failure("output_binary_int: not a binary channel")) as ex ->
+      Printf.eprintf "File \"fastPGOCaml.ml\": %s\n%s\n%!" (Printexc.to_string ex) (Printexc.get_backtrace());
+  end;*)
   (* Closes the underlying socket too. *)
   close_in conn.ichan
 

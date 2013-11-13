@@ -51,8 +51,9 @@ module Make (X : sig val datasource : Datasource.t end) = struct
     let re = Str.regexp "'" in
     Str.global_replace re "''"
 
-  let create_sql_char str = sprintf "'%s'" (escape_sql_char str)
+  let create_sql_char str = "'" ^ (escape_sql_char str) ^ "'"
 
+  (** column functions *)
   let column_text_default default row i =
     match row.(i) with None -> default | Some txt -> txt
 
@@ -89,6 +90,7 @@ module Make (X : sig val datasource : Datasource.t end) = struct
   let column_bool_opt row i =
     match row.(i) with None -> None | Some b -> Some (FastPGOCaml.bool_of_string b)
 
+  (** bind functions *)
   let bind_float_opt flopt =
     match flopt with None -> None | Some flo -> Some (string_of_float flo)
   let bind_int_opt n =
@@ -125,8 +127,8 @@ module Make (X : sig val datasource : Datasource.t end) = struct
         match db with None -> release_connection con | _ -> ();
       end;;
 
-  (** select_first_pair *)
-  let select_first_pair ?db ?name sql =
+  (** select_first_2 *)
+  let select_first_2 ?db ?name sql =
     let name = match name with None -> Printf.sprintf "select_first_pair-%f" (Unix.gettimeofday()) | Some x -> x in
     let con = match db with None -> get_connection () | Some con -> con in
     let is_prepared = ref false in
@@ -144,8 +146,6 @@ module Make (X : sig val datasource : Datasource.t end) = struct
       if !is_prepared then (FastPGOCaml.close_statement ~name con ());
       match db with None -> release_connection con | _ -> ();
     end
-
-  let select_first_2 = select_first_pair
 
   (** select_first_3 *)
   let select_first_3 ?db ?name sql =
@@ -196,24 +196,23 @@ module Make (X : sig val datasource : Datasource.t end) = struct
       match db with None -> release_connection con | _ -> ();
     end
 
-  (** select_first_list *)
-  let select_first_list ?db ?name sql =
-    let name = match name with None -> Printf.sprintf "select_first_list-%f" (Unix.gettimeofday()) | Some x -> x in
-    let con = match db with None -> get_connection () | Some con -> con in
-    let is_prepared = ref false in
-    begin fun () ->
-      let stmt = FastPGOCaml.prepare con ~name ~query:sql () in
-      is_prepared := true;
-      let rs = FastPGOCaml.execute con ~name ~params:[] () in
-      begin fun () -> try
-          let row = FastPGOCaml.next rs in
-          Array.to_list row
-        with FastPGOCaml.Ready_for_query -> []
-      end /*finally*/ (fun () -> FastPGOCaml.close_result_set rs)
-    end /*finally*/ begin fun () ->
-      if !is_prepared then (FastPGOCaml.close_statement ~name con ());
-      match db with None -> release_connection con | _ -> ();
-    end
+(** select_first_array *)
+let select_first_array ?db ?name ?(params=[]) sql =
+  let name = match name with None -> Printf.sprintf "select_first_array%f" (Unix.gettimeofday()) | Some x -> x in
+  let con = match db with None -> get_connection () | Some con -> con in
+  let is_prepared = ref false in
+  begin fun () ->
+    let stmt = FastPGOCaml.prepare con ~name ~query:sql () in
+    is_prepared := true;
+    let rs = FastPGOCaml.execute con ~name ~params () in
+    begin fun () -> try
+      FastPGOCaml.next rs
+    with FastPGOCaml.Ready_for_query -> [||]
+    end /*finally*/ (fun () -> FastPGOCaml.close_result_set rs)
+  end /*finally*/ begin fun () ->
+    if !is_prepared then (FastPGOCaml.close_statement ~name con ());
+    (match db with None -> release_connection con | _ -> ());
+  end
 
   (** Itera la funzione [finish] su tutti i risultati restituita dalla select.
    * Se [finish] restituisce [true], il ciclo di iterazioni si interrompe e
@@ -223,7 +222,6 @@ module Make (X : sig val datasource : Datasource.t end) = struct
    *
   *)
   let select_iter ?db ?name ?meta ?(params=[]) finish sql =
-    (*kprintf (App_log.print `ERROR) "--------------\n%s\n----------------\n%!" sql;*)
     let name = match name with None -> Printf.sprintf "select_iter-%f" (Unix.gettimeofday()) | Some x -> x in
     let con = match db with None -> get_connection () | Some con -> con in
     let is_prepared = ref false in
@@ -271,12 +269,12 @@ module Make (X : sig val datasource : Datasource.t end) = struct
     let count = ref 0 in fun () -> incr count; Printf.sprintf "sp%d" !count
 
   (** execute_transaction *)
-  let execute_transaction ~f =
+  let execute_transaction f =
     let db = get_connection () in
     begin fun () ->
       prepare_and_exec db "BEGIN TRANSACTION;";
       try
-        let result = f ~db in
+        let result = f db in
         prepare_and_exec db "COMMIT;";
         result
       with ex -> begin
@@ -323,7 +321,7 @@ module Make (X : sig val datasource : Datasource.t end) = struct
 
 
   (** get_column_names *)
-  let get_column_names ~db tabname =
+  let get_column_names ~db ~tabname =
     let sql = sprintf "SELECT column_name FROM information_schema.columns WHERE table_name = '%s'" tabname in
     let result = ref [] in
     select_iter ~db begin function
