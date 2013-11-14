@@ -20,6 +20,9 @@
 
 *)
 
+
+(** Generic datasource management. *)
+
 module type DRIVER =
   sig
     type connection

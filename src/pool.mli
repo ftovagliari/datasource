@@ -20,6 +20,9 @@
 
 *)
 
+
+(** Generic object pooling. *)
+
 module type POOLED_OBJECT =
   sig
     type p

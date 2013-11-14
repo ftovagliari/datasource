@@ -1,10 +1,14 @@
-Datasource management, connection pooling and other postgres stuff for OCaml
-(thanks to "PG'OCaml")
+Datasource management and connection pooling.
+The library also provides functions to allow easy use of the PostgreSQL
+database from OCaml applications (thanks to "PG'OCaml").
 
 COPYRIGHT:
 
   This software is distributed under the GNU GENERAL PUBLIC LICENSE Version 3.
   See the enclosed file COPYING for more details.
+
+  Module "FastPGOCaml" is a modified version of PG'OCaml-1.3
+  (see http://pgocaml.forge.ocamlcore.org/).
 
 
 DEPENDENCIES:

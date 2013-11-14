@@ -2,6 +2,8 @@
  * $Id: pGOCaml.mli,v 1.10 2006/02/19 22:51:17 rich Exp $
  *)
 
+(** Access to PostgreSQL databases (based on PGOCaml-1.3). *)
+
 open CalendarLib
 
 type 'a t				(** Database handle. *)
