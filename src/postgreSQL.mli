@@ -42,10 +42,10 @@ module Escape :
 module Make :
   functor (DATASOURCE : sig val datasource : Datasource.t end) ->
     sig
-      (** Get a connection from the connection pool. *)
+      (** Gets a connection from the connection pool. *)
       val get_connection : unit -> Datasource.connection
 
-      (** Release a connection to the connection pool. *)
+      (** Releases a connection to the connection pool. *)
       val release_connection : Datasource.connection -> unit
 
       (**  *)
@@ -103,11 +103,11 @@ module Make :
         ?name:string ->
         ?params:string option list -> string -> string option array
 
-      (** [select_iter func query] applies [func] to every result returned by
+      (** [select_iter func query] applies [func] to each result returned by
           the [query]. When [func] returns [true] the loop that iterates over
           the result set is interrupted and [select_iter] terminates.
 
-          @param db The database connection used for the query; when not given,
+          @param db The database connection used for the query; when [None],
                     a new connection is taken from the pool.
           @param params Parameters passed to the SQL query.
           @param meta Reference to the query metadata that can be used by [func].
@@ -134,8 +134,6 @@ module Make :
         ?params:string option list list ->
         ?returning:('a FastPGOCaml.result_set -> unit) -> string -> unit
 
-      val new_savepoint_name : unit -> string
-
       (** Executes the given function inside a transaction, in case of exception
           the transaction is rolled-back otherwise it is committed.
         *)
@@ -147,14 +145,17 @@ module Make :
 
       (** Counts the number of results that the given [SELECT] statement would return
           if executed. The result is obtained by executing the query obtained
-          by replacing [COUNT( * )] in the SELECT part of the given statement.
+          by replacing [COUNT( * )] in the SELECT part of the statement.
         *)
       val count_results : db:Datasource.connection -> string -> int
+
+      val get_column_names :
+        db:Datasource.connection -> tabname:string -> string list
 
       type value = NULL | TIMESTAMP of float | TEXT of string
 
       val create_update_set : (string * value option) list -> string
 
-      val get_column_names :
-        db:Datasource.connection -> tabname:string -> string list
+      val new_savepoint_name : unit -> string
+
     end
