@@ -12,8 +12,8 @@
   <version>1.0.0</version>
   <autocomp enabled="true" delay="1." cflags=""/>
   <targets>
-    <target name="datasource" default="true" id="0" sub_targets="">
-      <descr></descr>
+    <target name="datasource" default="true" id="0" sub_targets="1" is_fl_package="true" subsystem="" readonly="false" visible="true" node_collapsed="false">
+      <descr>Datasource management and connection pooling.</descr>
       <byt>true</byt>
       <opt>true</opt>
       <libs></libs>
@@ -27,39 +27,18 @@
       <inline></inline>
       <nodep>false</nodep>
       <dontlinkdep>false</dontlinkdep>
+      <dontaddopt>false</dontaddopt>
       <cflags>-w sy -g</cflags>
       <lflags>-g</lflags>
       <target_type>Library</target_type>
       <outname>datasource</outname>
       <lib_install_path>datasource</lib_install_path>
-      <external_tasks/>
-      <restrictions></restrictions>
-      <dependencies></dependencies>
-    </target>
-    <target name="pgdatasource" default="false" id="1" sub_targets="">
-      <descr></descr>
-      <byt>true</byt>
-      <opt>true</opt>
-      <libs></libs>
-      <other_objects></other_objects>
-      <files>postgreSQL.ml</files>
-      <package>calendar</package>
-      <includes></includes>
-      <thread>true</thread>
-      <vmthread>false</vmthread>
-      <pp></pp>
-      <inline></inline>
-      <nodep>false</nodep>
-      <dontlinkdep>false</dontlinkdep>
-      <cflags>-w sy -g</cflags>
-      <lflags>-g</lflags>
-      <target_type>Library</target_type>
-      <outname>pgdatasource</outname>
-      <lib_install_path>datasource</lib_install_path>
       <external_tasks>
         <task name="ocamldoc">
           <always_run_in_project>true</always_run_in_project>
           <always_run_in_script>true</always_run_in_script>
+          <readonly>false</readonly>
+          <visible>true</visible>
           <env replace="false"/>
           <dir></dir>
           <cmd>ocamlfind</cmd>
@@ -75,9 +54,34 @@
         </task>
       </external_tasks>
       <restrictions></restrictions>
+      <dependencies></dependencies>
+    </target>
+    <target name="pg" default="false" id="1" sub_targets="" is_fl_package="true" subsystem="" readonly="false" visible="true" node_collapsed="false">
+      <descr>Fast PostgreSQL driver based on PG&apos;OCaml.</descr>
+      <byt>true</byt>
+      <opt>true</opt>
+      <libs></libs>
+      <other_objects></other_objects>
+      <files>postgreSQL.ml</files>
+      <package>calendar</package>
+      <includes></includes>
+      <thread>true</thread>
+      <vmthread>false</vmthread>
+      <pp></pp>
+      <inline></inline>
+      <nodep>false</nodep>
+      <dontlinkdep>false</dontlinkdep>
+      <dontaddopt>false</dontaddopt>
+      <cflags>-w sy -g</cflags>
+      <lflags>-g</lflags>
+      <target_type>Library</target_type>
+      <outname>pgdatasource</outname>
+      <lib_install_path>datasource</lib_install_path>
+      <external_tasks/>
+      <restrictions></restrictions>
       <dependencies>0</dependencies>
     </target>
-    <target name="Tools" default="false" id="2" sub_targets="">
+    <target name="Tools" default="false" id="2" sub_targets="" is_fl_package="false" subsystem="" readonly="false" visible="true" node_collapsed="false">
       <descr></descr>
       <byt>true</byt>
       <opt>false</opt>
@@ -92,6 +96,7 @@
       <inline></inline>
       <nodep>false</nodep>
       <dontlinkdep>false</dontlinkdep>
+      <dontaddopt>false</dontaddopt>
       <cflags></cflags>
       <lflags></lflags>
       <target_type>Executable</target_type>
@@ -101,6 +106,8 @@
         <task name="Distclean">
           <always_run_in_project>false</always_run_in_project>
           <always_run_in_script>false</always_run_in_script>
+          <readonly>false</readonly>
+          <visible>true</visible>
           <env replace="false"/>
           <dir></dir>
           <cmd>ocaml</cmd>
@@ -109,26 +116,85 @@
           </args>
           <phase></phase>
         </task>
-        <task name="Findlib-install">
+      </external_tasks>
+      <restrictions></restrictions>
+      <dependencies></dependencies>
+    </target>
+    <target name="FINDLIB-TOOLS" default="false" id="3" sub_targets="" is_fl_package="false" subsystem="" readonly="true" visible="true" node_collapsed="false">
+      <descr></descr>
+      <byt>true</byt>
+      <opt>false</opt>
+      <libs></libs>
+      <other_objects></other_objects>
+      <files></files>
+      <package></package>
+      <includes></includes>
+      <thread>false</thread>
+      <vmthread>false</vmthread>
+      <pp></pp>
+      <inline></inline>
+      <nodep>false</nodep>
+      <dontlinkdep>false</dontlinkdep>
+      <dontaddopt>false</dontaddopt>
+      <cflags></cflags>
+      <lflags></lflags>
+      <target_type>External</target_type>
+      <outname></outname>
+      <lib_install_path></lib_install_path>
+      <external_tasks>
+        <task name="install">
           <always_run_in_project>false</always_run_in_project>
           <always_run_in_script>false</always_run_in_script>
+          <readonly>true</readonly>
+          <visible>true</visible>
           <env replace="false"/>
-          <dir></dir>
+          <dir>..</dir>
           <cmd>ocaml</cmd>
           <args>
-            <arg enabled="true">../tools/findlib_install.ml</arg>
+            <arg enabled="true">tools/findlib.ml</arg>
+            <arg enabled="true">install</arg>
           </args>
           <phase></phase>
         </task>
-        <task name="Findlib-uninstall">
+        <task name="uninstall">
           <always_run_in_project>false</always_run_in_project>
           <always_run_in_script>false</always_run_in_script>
+          <readonly>true</readonly>
+          <visible>true</visible>
           <env replace="false"/>
-          <dir></dir>
-          <cmd>ocamlfind</cmd>
+          <dir>..</dir>
+          <cmd>ocaml</cmd>
           <args>
-            <arg enabled="true">remove</arg>
-            <arg enabled="true">datasource</arg>
+            <arg enabled="true">tools/findlib.ml</arg>
+            <arg enabled="true">uninstall</arg>
+          </args>
+          <phase></phase>
+        </task>
+        <task name="reinstall">
+          <always_run_in_project>false</always_run_in_project>
+          <always_run_in_script>false</always_run_in_script>
+          <readonly>true</readonly>
+          <visible>true</visible>
+          <env replace="false"/>
+          <dir>..</dir>
+          <cmd>ocaml</cmd>
+          <args>
+            <arg enabled="true">tools/findlib.ml</arg>
+            <arg enabled="true">reinstall</arg>
+          </args>
+          <phase></phase>
+        </task>
+        <task name="print">
+          <always_run_in_project>false</always_run_in_project>
+          <always_run_in_script>false</always_run_in_script>
+          <readonly>true</readonly>
+          <visible>true</visible>
+          <env replace="false"/>
+          <dir>..</dir>
+          <cmd>ocaml</cmd>
+          <args>
+            <arg enabled="true">tools/findlib.ml</arg>
+            <arg enabled="true">print</arg>
           </args>
           <phase></phase>
         </task>
@@ -143,12 +209,11 @@
       <target target_id="0" show="true"/>
       <target target_id="1" show="true"/>
       <target target_id="2" show="false"/>
+      <target target_id="3" show="false"/>
     </targets>
     <args/>
     <commands>
       <command name="Distclean" descr="Distclean" target_id="2" task_name="Distclean"/>
-      <command name="Install" descr="Findlib-install" target_id="2" task_name="Findlib-install"/>
-      <command name="Uninstall" descr="Findlib-uninstall" target_id="2" task_name="Findlib-uninstall"/>
     </commands>
   </build_script>
 </project>
