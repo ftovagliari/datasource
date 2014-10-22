@@ -59,19 +59,6 @@
       <outname>pgdatasource</outname>
       <lib_install_path>datasource</lib_install_path>
       <external_tasks>
-        <task name="mkdir_doc">
-          <always_run_in_project>true</always_run_in_project>
-          <always_run_in_script>true</always_run_in_script>
-          <readonly>false</readonly>
-          <visible>true</visible>
-          <env replace="false"/>
-          <dir>..</dir>
-          <cmd>mkdir</cmd>
-          <args>
-            <arg enabled="true">doc</arg>
-          </args>
-          <phase>After_compile</phase>
-        </task>
         <task name="ocamldoc">
           <always_run_in_project>true</always_run_in_project>
           <always_run_in_script>true</always_run_in_script>
@@ -227,6 +214,8 @@
     <args/>
     <commands>
       <command name="Distclean" descr="Distclean" target_id="2" task_name="Distclean"/>
+      <command name="Install" descr="reinstall" target_id="3" task_name="reinstall"/>
+      <command name="Uninstall" descr="uninstall" target_id="3" task_name="uninstall"/>
     </commands>
   </build_script>
 </project>

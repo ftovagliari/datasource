@@ -36,20 +36,6 @@ let cmd_line_args = [
 let external_tasks = [
   
   0, (fun command -> {
-    et_name                  = "mkdir_doc";
-    et_env                   = [];
-    et_env_replace           = false;
-    et_dir                   = "..";
-    et_cmd                   = "mkdir";
-    et_args                  = [true,"doc"];
-    et_phase                 = Some After_compile;
-    et_always_run_in_project = true;
-    et_always_run_in_script  = true;
-    et_readonly              = false;
-    et_visible               = true;
-  });
-  
-  1, (fun command -> {
     et_name                  = "ocamldoc";
     et_env                   = [];
     et_env_replace           = false;
@@ -63,7 +49,7 @@ let external_tasks = [
     et_visible               = true;
   });
   
-  2, (fun command -> {
+  1, (fun command -> {
     et_name                  = "Distclean";
     et_env                   = [];
     et_env_replace           = false;
@@ -77,7 +63,7 @@ let external_tasks = [
     et_visible               = true;
   });
   
-  3, (fun command -> {
+  2, (fun command -> {
     et_name                  = "install";
     et_env                   = [];
     et_env_replace           = false;
@@ -91,7 +77,7 @@ let external_tasks = [
     et_visible               = true;
   });
   
-  4, (fun command -> {
+  3, (fun command -> {
     et_name                  = "uninstall";
     et_env                   = [];
     et_env_replace           = false;
@@ -105,7 +91,7 @@ let external_tasks = [
     et_visible               = true;
   });
   
-  5, (fun command -> {
+  4, (fun command -> {
     et_name                  = "reinstall";
     et_env                   = [];
     et_env_replace           = false;
@@ -119,7 +105,7 @@ let external_tasks = [
     et_visible               = true;
   });
   
-  6, (fun command -> {
+  5, (fun command -> {
     et_name                  = "print";
     et_env                   = [];
     et_env_replace           = false;
@@ -136,7 +122,9 @@ let external_tasks = [
 
 
 let general_commands = [
-  `Distclean, (2, "Distclean");
+  `Distclean, (1, "Distclean");
+  `Install, (4, "reinstall");
+  `Uninstall, (3, "uninstall");
 ]
 
 
@@ -199,7 +187,7 @@ let targets = [
     dontaddopt           = false;
     library_install_dir  = "datasource"; (* Relative to the Standard Library Directory *)
     other_objects        = "";
-    external_tasks       = [0; 1];
+    external_tasks       = [0];
     restrictions         = [];
     dependencies         = [0];
     show                 = true;
@@ -230,7 +218,7 @@ let targets = [
     dontaddopt           = false;
     library_install_dir  = ""; (* Relative to the Standard Library Directory *)
     other_objects        = "";
-    external_tasks       = [2];
+    external_tasks       = [1];
     restrictions         = [];
     dependencies         = [];
     show                 = false;
@@ -261,7 +249,7 @@ let targets = [
     dontaddopt           = false;
     library_install_dir  = ""; (* Relative to the Standard Library Directory *)
     other_objects        = "";
-    external_tasks       = [3; 4; 5; 6];
+    external_tasks       = [2; 3; 4; 5];
     restrictions         = [];
     dependencies         = [];
     show                 = false;
