@@ -59,6 +59,19 @@
       <outname>pgdatasource</outname>
       <lib_install_path>datasource</lib_install_path>
       <external_tasks>
+        <task name="mkdir_doc">
+          <always_run_in_project>true</always_run_in_project>
+          <always_run_in_script>true</always_run_in_script>
+          <readonly>false</readonly>
+          <visible>true</visible>
+          <env replace="false"/>
+          <dir>..</dir>
+          <cmd>mkdir</cmd>
+          <args>
+            <arg enabled="true">doc</arg>
+          </args>
+          <phase>After_compile</phase>
+        </task>
         <task name="ocamldoc">
           <always_run_in_project>true</always_run_in_project>
           <always_run_in_script>true</always_run_in_script>
