@@ -28,20 +28,16 @@ package \"pg\" (
     "pgdatasource.cma";
     "pgdatasource.cmxa"
   ], [
-    "tests.cmi";
-    "pool.cmi";
-    "datasourceUtil.cmi";
-    "fastPGOCaml-0.4.cmi";
-    "fastPGOCaml.cmi";
     "datasource.cmi";
+    "datasourceUtil.cmi";
+    "fastPGOCaml.cmi";
     "pg_escape.cmi";
-    "postgreSQL.cmi";
-    "S3.cmi";
-    "test.cmi"
+    "pool.cmi";
+    "postgreSQL.cmi"
   ], [
-    "pool.mli";
-    "fastPGOCaml.mli";
     "datasource.mli";
+    "fastPGOCaml.mli";
+    "pool.mli";
     "postgreSQL.mli"
   ];
 ]
